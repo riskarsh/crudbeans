@@ -1,47 +1,70 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from "react";
 
 const FormComponent = () => {
   const [formData, setFormData] = useState({
-    firstName: '',
-    lastName: '',
-    email: '',
-    phone: '',
+    firstName: "",
+    lastName: "",
+    email: "",
+    phone: "",
   });
 
   const [tableData, setTableData] = useState([]);
-  
+  const [editIndex, setEditIndex] = useState(null);
 
   useEffect(() => {
     // Load data from local storage
-    const storedData = JSON.parse(localStorage.getItem('tableData'));
+    const storedData = JSON.parse(localStorage.getItem("tableData"));
     if (storedData) {
       setTableData(storedData);
     }
-  },[]);
+  }, []);
 
-
+  useEffect(() => {
+    // Save data to local storage after changes
+    localStorage.setItem("tableData", JSON.stringify(tableData));
+  }, [tableData]);
 
   const handleChange = (e) => {
-    const {name, value } = e.target;
+    const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    setTableData([...tableData, formData]);
-    setFormData({ firstName: '', lastName: '', email: '', phone: '' });
+
+    if (editIndex !== null) {
+      // If entry exists, update it
+      const updatedTableData = [...tableData];
+      updatedTableData[editIndex] = formData;
+      setTableData(updatedTableData);
+      setEditIndex(null);
+    } else {
+      // If not editing, add a new entry
+      setTableData([...tableData, formData]);
+    }
+
+    setFormData({ firstName: "", lastName: "", email: "", phone: "" });
   };
 
-
+  //Handle edit of the data
+  const handleEdit = (index) => {
+    setEditIndex(index);
+    const editedData = tableData[index];
+    setFormData(editedData);
+  };
   //Handle additon of adding data
   const handleAddMore = () => {
-    setFormData({ firstName: '', lastName: '', email: '', phone: '' });
+    setFormData({ firstName: "", lastName: "", email: "", phone: "" });
   };
-  
-  //Handle deletion of the data 
+
+  //Handle deletion of the data
   const handleDelete = (index) => {
     const updatedTableData = tableData.filter((item, i) => i !== index);
     setTableData(updatedTableData);
+  };
+
+  const handleClearStorage = () => {
+    localStorage.clear();
   };
 
   return (
@@ -79,10 +102,14 @@ const FormComponent = () => {
           placeholder="Phone"
         />
 
-        <button type="submit">Submit</button>
+        <button type="submit">
+          {editIndex !== null ? "Update" : "Submit"}
+        </button>
       </form>
 
       <button onClick={handleAddMore}>Add More</button>
+
+      <button onClick={handleClearStorage}>Clear Storage</button>
 
       <table>
         <thead>
@@ -102,6 +129,7 @@ const FormComponent = () => {
               <td>{item.email}</td>
               <td>{item.phone}</td>
               <td>
+                <button onClick={() => handleEdit(index)}>Edit</button>
                 <button onClick={() => handleDelete(index)}>Delete</button>
               </td>
             </tr>
