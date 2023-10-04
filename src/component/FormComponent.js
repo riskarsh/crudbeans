@@ -1,27 +1,47 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect } from 'react';
 
 const FormComponent = () => {
   const [formData, setFormData] = useState({
-    firstName: "",
-    lastName: "",
-    email: "",
-    phone: "",
+    firstName: '',
+    lastName: '',
+    email: '',
+    phone: '',
   });
 
   const [tableData, setTableData] = useState([]);
+  
 
   useEffect(() => {
     // Load data from local storage
-    const storedData = JSON.parse(localStorage.getItem("tableData"));
+    const storedData = JSON.parse(localStorage.getItem('tableData'));
     if (storedData) {
       setTableData(storedData);
     }
-  }, []);
+  },[]);
+
+
+
+  const handleChange = (e) => {
+    const {name, value } = e.target;
+    setFormData({ ...formData, [name]: value });
+  };
 
   const handleSubmit = (e) => {
-    // e.preventDefault();
+    e.preventDefault();
     setTableData([...tableData, formData]);
-    localStorage.setItem("tableData", JSON.stringify(tableData));
+    setFormData({ firstName: '', lastName: '', email: '', phone: '' });
+  };
+
+
+  //Handle additon of adding data
+  const handleAddMore = () => {
+    setFormData({ firstName: '', lastName: '', email: '', phone: '' });
+  };
+  
+  //Handle deletion of the data 
+  const handleDelete = (index) => {
+    const updatedTableData = tableData.filter((item, i) => i !== index);
+    setTableData(updatedTableData);
   };
 
   return (
@@ -31,6 +51,7 @@ const FormComponent = () => {
           type="text"
           name="firstName"
           value={formData.firstName}
+          onChange={handleChange}
           placeholder="First name"
         />
 
@@ -38,6 +59,7 @@ const FormComponent = () => {
           type="text"
           name="lastName"
           value={formData.lastName}
+          onChange={handleChange}
           placeholder="Last name"
         />
 
@@ -45,6 +67,7 @@ const FormComponent = () => {
           type="email"
           name="email"
           value={formData.email}
+          onChange={handleChange}
           placeholder="Email"
         />
 
@@ -52,11 +75,14 @@ const FormComponent = () => {
           type="text"
           name="phone"
           value={formData.phone}
+          onChange={handleChange}
           placeholder="Phone"
         />
 
         <button type="submit">Submit</button>
       </form>
+
+      <button onClick={handleAddMore}>Add More</button>
 
       <table>
         <thead>
@@ -75,6 +101,9 @@ const FormComponent = () => {
               <td>{item.lastName}</td>
               <td>{item.email}</td>
               <td>{item.phone}</td>
+              <td>
+                <button onClick={() => handleDelete(index)}>Delete</button>
+              </td>
             </tr>
           ))}
         </tbody>
