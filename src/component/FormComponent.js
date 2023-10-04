@@ -11,8 +11,8 @@ const FormComponent = () => {
   const [tableData, setTableData] = useState([]);
   const [editIndex, setEditIndex] = useState(null);
 
+  // Load data from local storage
   useEffect(() => {
-    // Load data from local storage
     const storedData = JSON.parse(localStorage.getItem("tableData"));
     if (storedData) {
       setTableData(storedData);
@@ -28,25 +28,22 @@ const FormComponent = () => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
   };
-
+  
+  //Handle form submission
   const handleSubmit = (e) => {
     e.preventDefault();
-
     if (editIndex !== null) {
-      // If entry exists, update it
       const updatedTableData = [...tableData];
       updatedTableData[editIndex] = formData;
       setTableData(updatedTableData);
       setEditIndex(null);
     } else {
-      // If not editing, add a new entry
       setTableData([...tableData, formData]);
     }
-
     setFormData({ firstName: "", lastName: "", email: "", phone: "" });
   };
 
-  //Handle edit of the data
+  //Handle editing of the data
   const handleEdit = (index) => {
     setEditIndex(index);
     const editedData = tableData[index];
@@ -62,9 +59,10 @@ const FormComponent = () => {
     const updatedTableData = tableData.filter((item, i) => i !== index);
     setTableData(updatedTableData);
   };
-
+  //Clear local storage data
   const handleClearStorage = () => {
     localStorage.clear();
+    setTableData([]);
   };
 
   return (
